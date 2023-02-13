@@ -14,6 +14,11 @@ namespace Server.Repositorios
         }
         public async Task<FornecedorModel> AddSupplier(FornecedorModel fornecedor)
         {
+            if (fornecedor.Cep.Length < 8 || (fornecedor.Cnpj_Cpf.Length > 0 && fornecedor.Cnpj_Cpf.Length < 14))
+            {
+                throw new Exception("Preencher o campo corretamente");
+            }
+
             await _dbContext.AddAsync(fornecedor);
             await _dbContext.SaveChangesAsync();
 
@@ -52,6 +57,10 @@ namespace Server.Repositorios
             if (fornecedorById == null)
             {
                 throw new Exception($"Usuário para o ID:{id} não foi encontrado no banco de dados.");
+            }
+            if (fornecedor.Cep.Length < 8 || (fornecedor.Cnpj_Cpf.Length > 0 && fornecedor.Cnpj_Cpf.Length < 14))
+            {
+                throw new Exception("Preencher o campo corretamente");
             }
 
             fornecedorById.Cnpj_Cpf = fornecedor.Cnpj_Cpf;

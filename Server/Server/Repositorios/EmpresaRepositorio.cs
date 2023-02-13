@@ -2,6 +2,8 @@
 using Server.Data;
 using Server.Models;
 using Server.Repositorios.Interfaces;
+using Newtonsoft.Json;
+using System.Net;
 
 namespace Server.Repositorios
 {
@@ -9,15 +11,22 @@ namespace Server.Repositorios
     {
         private readonly ServerDBContext _dbContext;
 
+
         public EmpresaRepositorio(ServerDBContext serverDBContext)
         {
             _dbContext = serverDBContext;
         }
 
         public async Task<EmpresaModel> AddCompany(EmpresaModel empresa)
-        {
+        {  
+            if (empresa.Cep.Length < 8 || (empresa.Cnpj.Length > 0 && empresa.Cnpj.Length < 14))
+            {
+                throw new Exception("Preencher o campo corretamente");
+            }
+
             await _dbContext.AddAsync(empresa);
             await _dbContext.SaveChangesAsync();
+
 
             return empresa;
         }
@@ -54,6 +63,11 @@ namespace Server.Repositorios
             if (empresaById == null)
             {
                 throw new Exception($"Usuário para o ID:{id} não foi encontrado no banco de dados.");
+            }
+
+            if (empresa.Cep.Length < 8 || (empresa.Cnpj.Length > 0 && empresa.Cnpj.Length < 14))
+            {
+                throw new Exception("Preencher o campo corretamente");
             }
 
             empresaById.Cnpj = empresa.Cnpj;
